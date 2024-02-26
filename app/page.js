@@ -1,8 +1,11 @@
 import getSwapiPeople from "@/utils/api/getSwapiPeople";
+import formatSwapiPeople from "@/utils/format/formatSwapiPeople";
 import Image from "next/image";
 
 export default async function Home() {
-  const people = await getSwapiPeople();
+  const people = await getSwapiPeople().then((people) =>
+    formatSwapiPeople(people)
+  );
 
   console.log(people, people?.length);
 
