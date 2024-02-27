@@ -1,8 +1,10 @@
+import snakeToLowerCamelCase from "./snakeToLowerCamelCase";
+
 /**
  * Format swapi person objects into compact format
  *
  * @param {{object[]}} people
- * @returns {{name: string, hair_color: [string], url: string, starship: string|null}[]}
+ * @returns {{name: string, hair_color: string[], url: string, starship: string}[]}
  */
 export default function formatSwapiPeople(people) {
   if (typeof people !== "object" || !Array.isArray(people)) return false;
@@ -21,19 +23,17 @@ export default function formatSwapiPeople(people) {
       return (
         parseInt(person.height) >= 167 &&
         person.gender === "male" &&
-        (person.hair_color === "white" || person.hair_color === "brown") &&
+        (person.hair_color.includes("white") ||
+          person.hair_color.includes("brown")) &&
         person.starships.length >= 1
       );
     })
-    .map((person) => {
-      return {
+    .map((person) =>
+      snakeToLowerCamelCase({
         name: person.name,
-        hair_color: [person.hair_color],
+        hair_color: person.hair_color.split(", "),
         url: person.url,
-        starship:
-          person.starships.length > 0
-            ? person.starships[person.starships.length - 1]
-            : null,
-      };
-    });
+        starship: person.starships[person.starships.length - 1],
+      })
+    );
 }
