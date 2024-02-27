@@ -5,8 +5,10 @@ import OpenAI from "openai";
  *
  * @param {string} prompt
  */
-export default async function generateImage(prompt) {
+export default async function generateImage(prompt, skipApi = false) {
   const openai = new OpenAI();
+
+  if (skipApi) return "https://placehold.co/1024x1024/png";
 
   return openai.images
     .generate({
@@ -18,6 +20,6 @@ export default async function generateImage(prompt) {
     .then((res) => res.data[0].url)
     .catch((e) => {
       console.error(`image generation failed: ${e}`);
-      return "https://placehold.co/1024x1024";
+      return "https://placehold.co/1024x1024/png";
     });
 }

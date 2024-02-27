@@ -37,12 +37,13 @@ export default async function getSwapiPeople(
     });
 }
 
-export async function getFormattedSwapiPeopleWithImages() {
+export async function getFormattedSwapiPeopleWithImages(skipImages = false) {
   const people = await getSwapiPeople();
   const formattedPeople = formatSwapiPeople(people);
+
   return Promise.all(
     formattedPeople.map((person) =>
-      generateImage(person.name).then((image) => {
+      generateImage(person.name, skipImages).then((image) => {
         return { ...person, image };
       })
     )
