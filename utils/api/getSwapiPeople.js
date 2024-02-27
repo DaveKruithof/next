@@ -1,3 +1,6 @@
+import formatSwapiPeople from "../format/formatSwapiPeople";
+import generateImage from "./generateImage";
+
 export default async function getSwapiPeople(
   url = "https://swapi.dev/api/people",
   attempt = 1,
@@ -32,4 +35,16 @@ export default async function getSwapiPeople(
 
       return false;
     });
+}
+
+export async function getFormattedSwapiPeopleWithImages() {
+  const people = await getSwapiPeople();
+  const formattedPeople = formatSwapiPeople(people);
+  return Promise.all(
+    formattedPeople.map((person) =>
+      generateImage(person.name).then((image) => {
+        return { ...person, image };
+      })
+    )
+  );
 }

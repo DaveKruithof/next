@@ -1,13 +1,8 @@
-import getSwapiPeople from "@/utils/api/getSwapiPeople";
-import formatSwapiPeople from "@/utils/format/formatSwapiPeople";
+import { getFormattedSwapiPeopleWithImages } from "@/utils/api/getSwapiPeople";
 import Image from "next/image";
 
 export default async function Home() {
-  const people = await getSwapiPeople().then((people) =>
-    formatSwapiPeople(people)
-  );
-
-  console.log(people, people?.length);
+  const people = await getFormattedSwapiPeopleWithImages();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
