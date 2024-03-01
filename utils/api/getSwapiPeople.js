@@ -1,5 +1,4 @@
 import formatSwapiPeople from "../format/formatSwapiPeople";
-import generateImage from "./generateImage";
 
 export default async function getSwapiPeople(
   url = "https://swapi.dev/api/people",
@@ -8,6 +7,7 @@ export default async function getSwapiPeople(
 ) {
   return fetch(url, {
     headers: { Accept: "application/json" },
+    next: { revalidate: 3600 }, // becomes stale after 1h
   })
     .then((req) => req.json())
     .then((json) => {
@@ -39,13 +39,5 @@ export default async function getSwapiPeople(
 
 export async function getFormattedSwapiPeopleWithImages(skipImages = false) {
   const people = await getSwapiPeople();
-  const formattedPeople = formatSwapiPeople(people);
-
-  return Promise.all(
-    formattedPeople.map((person) =>
-      generateImage(person.name, skipImages).then((image) => {
-        return { ...person, image };
-      })
-    )
-  );
+  return formatSwapiPeople(people);
 }
