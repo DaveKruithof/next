@@ -1,35 +1,44 @@
+import GeneratedImage, {
+  GeneratedImageFallback,
+} from "@/components/GeneratedImage";
 import { getFormattedSwapiPeopleWithImages } from "@/utils/api/getSwapiPeople";
-import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export default async function Home() {
   const people = await getFormattedSwapiPeopleWithImages();
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="max-w-7xl mx-auto">
       <h1>Matches:</h1>
       {Array.isArray(people) && !!people && (
-        <div className="flex flex-col items-center -space-y-4">
+        <div className="grid grid-cols-3 gap-4">
           {people.map((person, key) => (
-            <Link
-              href={person.url}
-              key={key}
-              className="relative inline-block h-96 w-96 rounded-full border-2 border-white object-cover object-center hover:z-10 focus:z-10 overflow-hidden group"
+            <div
+              className="bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 hover:scale-95 transition-all"
+              key={person.name}
             >
-              <Image
-                src={person.image}
-                width="1024"
-                height="1024"
-                alt={person.name}
-              />
-              <div className="absolute z-20 text-center inset-0 my-auto items-center hidden group-focus:flex group-hover:flex group-focus:bg-black/10 group-hover:bg-black/10">
-                <div className="mx-auto text-white">
-                  <h2 className="">{person.name}</h2>
-                  <p>Hair colors: {person.hairColor.join(", ")}</p>
-                  <p>Starship: {person.starship}</p>
-                </div>
+              <Link
+                href={person.url}
+                target="_blank"
+                className="flex aspect-square w-full items-center justify-center"
+              >
+                <Suspense
+                  fallback={<GeneratedImageFallback prompt={person.name} />}
+                >
+                  <GeneratedImage prompt={person.name} />
+                </Suspense>
+              </Link>
+              <div className="p-5">
+                <h2>{person.name}</h2>
+                <p className="mb-3 font-normal text-gray-700 dark:text-gray-400 ">
+                  Hair color(s): {person.hairColor.join(", ")} &{" "}
+                  <Link href={person.starship} target="_blank">
+                    {person.name}'s starship
+                  </Link>
+                </p>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}
