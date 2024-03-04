@@ -1,6 +1,23 @@
 import formatSwapiPeople from "../format/formatSwapiPeople";
 
-export default async function getSwapiPeople(
+/**
+ * Get all people from the swapi api
+ *
+ * @returns {Object[]}
+ */
+export default async function getSwapiPeople() {
+  return getAllSwapiPeoplePages();
+}
+
+/**
+ * Get all people pages from the swapi api
+ *
+ * @param {string} url
+ * @param {number} attempt
+ * @param {[]} people
+ * @returns {Object[]}
+ */
+async function getAllSwapiPeoplePages(
   url = "https://swapi.dev/api/people",
   attempt = 1,
   people = []
@@ -20,7 +37,7 @@ export default async function getSwapiPeople(
 
       // if there are more pages to fetch start recursive chain
       if (typeof json.next === "string") {
-        return getSwapiPeople(json.next, 1, people);
+        return getAllSwapiPeoplePages(json.next, 1, people);
       }
 
       return people;
@@ -30,14 +47,17 @@ export default async function getSwapiPeople(
 
       if (attempt < 2) {
         attempt += 1;
-        return getSwapiPeople(url, attempt, people);
+        return getAllSwapiPeoplePages(url, attempt, people);
       }
 
-      return false;
+      return [];
     });
 }
 
-export async function getFormattedSwapiPeopleWithImages(skipImages = false) {
+/**
+ * @returns {{name: string, hairColor: string[], url: string, starship: string}[]}
+ */
+export async function getFormattedSwapiPeopleWithImages() {
   const people = await getSwapiPeople();
   return formatSwapiPeople(people);
 }

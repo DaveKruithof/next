@@ -1,8 +1,8 @@
 import { deepStrictEqual } from "node:assert";
 import { describe, test } from "node:test";
-import snakeToLowerCamelCase from "./snakeToLowerCamelCase.js";
+import snakeToLowerCamelCase from "./objectPropertiesToCamelCase.js";
 
-describe("snakeToLowerCamelCase", () => {
+describe("objectPropertiesToCamelCase", () => {
   test("flat object transformation", () => {
     deepStrictEqual(
       snakeToLowerCamelCase({
@@ -39,5 +39,13 @@ describe("snakeToLowerCamelCase", () => {
         {},
       ]
     );
+  });
+
+  test("none workable argument type undefined", () => {
+    deepStrictEqual(snakeToLowerCamelCase(), undefined);
+  });
+
+  test("none workable argument type null", () => {
+    deepStrictEqual(snakeToLowerCamelCase(null), null);
   });
 });

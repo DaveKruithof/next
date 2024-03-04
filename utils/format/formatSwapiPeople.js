@@ -1,9 +1,9 @@
-import snakeToLowerCamelCase from "./snakeToLowerCamelCase";
+import objectPropertiesToCamelCase from "./objectPropertiesToCamelCase";
 
 /**
  * Format swapi person objects into compact format
  *
- * @param {{object[]}} people
+ * @param {{height: number, gender: string, hair_color: string, starships: string[], name: string, url: string}[]} people - swapi people objects
  * @returns {{name: string, hairColor: string[], url: string, starship: string}[]}
  */
 export default function formatSwapiPeople(people) {
@@ -12,16 +12,15 @@ export default function formatSwapiPeople(people) {
   return people
     .filter(
       (p) =>
-        typeof p === "object" &&
-        !Array.isArray(p) &&
-        !isNaN(p.height) &&
-        parseInt(p.height) >= 167 &&
+        parseInt(p.height ?? 0) >= 167 &&
         p.gender === "male" &&
-        (p.hair_color?.includes("white") || p.hair_color?.includes("brown")) &&
-        p.starships?.length >= 1
+        (p.hair_color ?? "")
+          .split(", ")
+          .some((value) => value === "white" || value === "brown") &&
+        Boolean(p.starships?.length)
     )
     .map(({ name, hair_color, url, starships }) =>
-      snakeToLowerCamelCase({
+      objectPropertiesToCamelCase({
         name,
         hair_color: hair_color.split(", "),
         url,

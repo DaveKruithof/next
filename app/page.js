@@ -11,9 +11,9 @@ export default async function Home() {
   return (
     <main className="max-w-7xl mx-auto">
       <h1>Matches:</h1>
-      {Array.isArray(people) && !!people && (
+      {Array.isArray(people) && !!people.length && (
         <div className="grid grid-cols-3 gap-4">
-          {people.map((person, key) => (
+          {people.map((person) => (
             <div
               className="bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 hover:scale-95 transition-all"
               key={person.name}
@@ -23,9 +23,7 @@ export default async function Home() {
                 target="_blank"
                 className="flex aspect-square w-full items-center justify-center"
               >
-                <Suspense
-                  fallback={<GeneratedImageFallback prompt={person.name} />}
-                >
+                <Suspense fallback={<GeneratedImageFallback />}>
                   <GeneratedImage prompt={person.name} />
                 </Suspense>
               </Link>

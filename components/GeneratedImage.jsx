@@ -2,43 +2,55 @@ import Image from "next/image";
 
 const FALLBACK_URL = "https://placehold.co/1024x1024/png";
 
+/**
+ * OpenAI generated image
+ *
+ * @param {Object} properties
+ * @param {string} properties[].prompt - textual description of what the image should display
+ * @returns {Image}
+ */
 export default async function GeneratedImage({ prompt }) {
-  const src = process.env.OPENAI_API_KEY
-    ? await fetch("https://api.openai.com/v1/images/generations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "dall-e-2",
-          prompt,
-          n: 1,
-          size: "1024x1024",
-        }),
-        next: { revalidate: 3600 * 24 }, // becomes stale after 24h,
-      })
-        .then((res) => res.json())
-        .then((json) => {
-          if (json.error) {
-            console.error(
-              "image generation error: " + JSON.stringify(json.error)
-            );
-            return FALLBACK_URL;
-          }
+  if (!process.env.OPENAI_API_KEY) {
+    return <Image src={FALLBACK_URL} width="1024" height="1024" alt={prompt} />;
+  }
 
-          return json.data[0].url;
-        })
-        .catch((e) => {
-          console.error("image generation error: " + e);
-          return FALLBACK_URL;
-        })
-    : FALLBACK_URL;
+  const src = await fetch("https://api.openai.com/v1/images/generations", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: "dall-e-2",
+      prompt,
+      n: 1,
+      size: "1024x1024",
+    }),
+    next: { revalidate: 3600 * 24 }, // becomes stale after 24h,
+  })
+    .then((res) => res.json())
+    .then((json) => {
+      if (json.error) {
+        console.error("image generation error: " + JSON.stringify(json.error));
+        return FALLBACK_URL;
+      }
+
+      return json.data[0].url;
+    })
+    .catch((e) => {
+      console.error("image generation error: " + e);
+      return FALLBACK_URL;
+    });
 
   return <Image src={src} width="1024" height="1024" alt={prompt} />;
 }
 
-export function GeneratedImageFallback({ prompt }) {
+/**
+ * Fallback component for when GeneratedImage is pending
+ *
+ * @returns {React.ReactElement}
+ */
+export function GeneratedImageFallback() {
   return (
     <svg
       aria-hidden="true"

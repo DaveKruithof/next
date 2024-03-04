@@ -1,16 +1,17 @@
 /**
  * Replaces snake casing structures in objects with lower camel casing
  *
- * @param {any} variable variable you want to format
+ * @param {{[key: string]: any} | {[key: string]: any}[]} variable variable you want to format
  * @returns {any}
  */
-export default function snakeToLowerCamelCase(variable) {
+export default function objectPropertiesToCamelCase(variable) {
   // if variable is not an object there is no need for formatting
-  if (typeof variable !== "object") return variable;
+  if (typeof variable !== "object" || Object.is(variable, null))
+    return variable;
 
   // if variable is an array format the content of the array
   if (Array.isArray(variable)) {
-    return variable.map((v) => snakeToLowerCamelCase(v));
+    return variable.map((v) => objectPropertiesToCamelCase(v));
   }
 
   // if variable is an object start transforming its possible
@@ -21,7 +22,7 @@ export default function snakeToLowerCamelCase(variable) {
     // if the key does not have an _ its safe to assume its not in snake case
     // TODO: would be nice to transform other types of casings into lower camel casing
     if (!key.includes("_")) {
-      obj[key] = snakeToLowerCamelCase(variable[key]);
+      obj[key] = objectPropertiesToCamelCase(variable[key]);
       continue;
     }
 
@@ -38,7 +39,7 @@ export default function snakeToLowerCamelCase(variable) {
       .join("");
 
     // set formatted key in the newly formatted variable
-    obj[formattedKey] = snakeToLowerCamelCase(variable[key]);
+    obj[formattedKey] = objectPropertiesToCamelCase(variable[key]);
   }
 
   return obj;
